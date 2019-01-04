@@ -15,7 +15,6 @@ class Category extends StatelessWidget {
         assert(color != null),
         assert(iconLocation != null),
         super(key: key);
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -88,6 +87,7 @@ class CategoryList extends StatelessWidget {
     for(int i =0; i<_categoryNames.length; i++){
       Category category = Category(text: _categoryNames[i], color: _baseColors[i], iconLocation: Icons.cloud);
       categoryList.add(category);
+      Color.fromARGB(a, r, g, b)
     }
 
     return categoryList;

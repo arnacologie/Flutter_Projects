@@ -57,7 +57,7 @@ class Conversion extends StatelessWidget {
   }
 }
 
-class ConverterRoute extends StatelessWidget{
+class ConverterRoute extends StatefulWidget{
   final String name;
   final List<Unit> units;
   final ColorSwatch color;
@@ -77,38 +77,30 @@ class ConverterRoute extends StatelessWidget{
   }
 
   @override
+  State<StatefulWidget> createState() => ConverterRouteState();
+}
+
+class ConverterRouteState extends State<ConverterRoute>{
+  @override
   Widget build(BuildContext context) {
     final conversions = <Conversion>[];
 
-    for (var i = 0; i < units.length; i++) {
-        conversions.add(Conversion(
-        name: units[i].name,
-        subName: 'Conversion: ${units[i].conversion}',
-        color: color,
+    for (var i = 0; i < widget.units.length; i++) {
+      conversions.add(Conversion(
+        name: widget.units[i].name,
+        subName: 'Conversion: ${widget.units[i].conversion}',
+        color: widget.color,
       ));
     }
 
     final listView = Container(
       color: Colors.white,
-      child: _buildConversionWidgets(conversions),
-    );
-
-    final appBar = AppBar(
-      elevation: 0.0,
-      title: Text(
-        name,
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 30.0,
-        ),
-      ),
-      centerTitle: true,
-      backgroundColor: color,
+      child: widget._buildConversionWidgets(conversions),
     );
 
     return Scaffold(
-      //appBar: appBar,
       body: listView,
     );
   }
+
 }
