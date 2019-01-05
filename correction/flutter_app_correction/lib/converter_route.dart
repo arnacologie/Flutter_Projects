@@ -82,9 +82,7 @@ class _ConverterRouteState extends State<ConverterRoute> {
                       .of(context)
                       .textTheme
                       .display1,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  )
+                  border: OutlineInputBorder()
               ),
             ),
             Container(
@@ -94,13 +92,13 @@ class _ConverterRouteState extends State<ConverterRoute> {
                 border: Border.all(
                   color: Theme.of(context).primaryColor
                 ),
-                borderRadius: BorderRadius.circular(10.0),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton(
                   elevation: 0,
                   items: dropdownOptions(),
                   onChanged: (_) {},
+                  style: Theme.of(context).textTheme.title,
                 ),
               ),
             ),
@@ -110,15 +108,57 @@ class _ConverterRouteState extends State<ConverterRoute> {
 
     final arrows = RotatedBox(
       quarterTurns: 1,
-      child: Icon(
-        Icons.compare_arrows,
-        size: 40.0,
-      )
+      child: InkWell(
+        borderRadius: BorderRadius.circular(100),
+        onTap: (){},
+        child: Icon(
+          Icons.compare_arrows,
+          size: 40.0,),
+      ),
+
     );
 
     final output = Padding(
-      padding: _padding,
+        padding: _padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              keyboardType: TextInputType.number,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
+              decoration: InputDecoration(
+                  labelText: 'Output',
+                  labelStyle: Theme
+                      .of(context)
+                      .textTheme
+                      .display1,
+                  border: OutlineInputBorder()
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top:10),
+              padding: _padding,
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: Theme.of(context).primaryColor
+                ),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  elevation: 0,
+                  items: dropdownOptions(),
+                  onChanged: (_) {},
+                  style: Theme.of(context).textTheme.title,
+                ),
+              ),
+            ),
+          ],
+        )
     );
+
     final display = Padding(
       padding: _padding,
       child : Column(
