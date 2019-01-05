@@ -15,7 +15,6 @@ void main() {
 }
 
 class RainbowCircle extends StatefulWidget {
-  final Color _color = Colors.blue;
 
   @override
   State<StatefulWidget> createState() => RainbowCircleState();

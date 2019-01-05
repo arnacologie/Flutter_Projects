@@ -40,6 +40,7 @@ class ConverterRoute extends StatefulWidget {
 class _ConverterRouteState extends State<ConverterRoute> {
   // TODO: Set some variables, such as for keeping track of the user's input
   // value and units
+  bool isTextValid = true;
 
   // TODO: Determine whether you need to override anything, such as initState()
 
@@ -59,6 +60,14 @@ class _ConverterRouteState extends State<ConverterRoute> {
       return outputNum.substring(0, outputNum.length - 1);
     }
     return outputNum;
+  }
+
+  void _isNumeric(String str) {
+    if(str == null) {
+      isTextValid = false;
+    }
+    isTextValid = double.tryParse(str) != null;
+    print(isTextValid.toString());
   }
 
   @override
@@ -82,8 +91,12 @@ class _ConverterRouteState extends State<ConverterRoute> {
                       .of(context)
                       .textTheme
                       .display1,
-                  border: OutlineInputBorder()
+                  border: OutlineInputBorder(),
+                errorText: isTextValid ? null : 'Veuillez entrer un nombre valide.',
               ),
+              onChanged: (text){
+                _isNumeric(text);
+              },
             ),
             Container(
               margin: EdgeInsets.only(top:10),
@@ -170,15 +183,6 @@ class _ConverterRouteState extends State<ConverterRoute> {
       )
     );
 
-
-    // TODO: Create a compare arrows icon.
-
-    // TODO: Create the 'output' group of widgets. This is a Column that
-    // includes the output value, and 'to' unit [Dropdown].
-
-    // TODO: Return the input, arrows, and output widgets, wrapped in a Column.
-
-    // TODO: Delete the below placeholder code.
     final unitWidgets = widget.units.map((Unit unit) {
       return Container(
         color: widget.color,
@@ -202,6 +206,8 @@ class _ConverterRouteState extends State<ConverterRoute> {
     /*ListView(
       children: unitWidgets,
     );*/
+
+
 
     return display;
   }
