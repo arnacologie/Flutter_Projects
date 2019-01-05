@@ -1,106 +1,181 @@
+// Copyright 2018 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:flutter/material.dart';
-import 'package:flutter_app_correction/unit.dart';
+import 'package:meta/meta.dart';
 
-final _rowHeight = 100.0;
-final _borderRadius = BorderRadius.circular(_rowHeight / 2);
+import 'unit.dart';
 
-class Conversion extends StatelessWidget {
+const _padding = EdgeInsets.all(16.0);
+
+/// [ConverterRoute] where users can input amounts to convert in one [Unit]
+/// and retrieve the conversion in another [Unit] for a specific [Category].
+///
+/// While it is named ConverterRoute, a more apt name would be ConverterScreen,
+/// because it is responsible for the UI at the route's destination.
+class ConverterRoute extends StatefulWidget {
+  /// This [Category]'s name.
   final String name;
-  final String subName;
-  final ColorSwatch color;
-  const Conversion({
-    Key key,
-    @required this.name,
-    @required this.subName,
-    @required this.color,
-  })
-      : assert(name != null),
-        assert(subName != null),
-        assert(color != null),
-        super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Material(
-        color: Colors.transparent,
-        child: Container(
-          height: _rowHeight,
-          color: color,
-          child: InkWell(
-            //borderRadius: _borderRadius,
-            //highlightColor: color,
-            //splashColor: color,
-            onTap: () {},
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    name,
-                    style: TextStyle(fontSize: 25, color: Colors.black),
-                  ),
-                  Text(
-                    subName,
-                    style: TextStyle(fontSize: 17, color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-    ),
-      );
-  }
-}
+  /// Color for this [Category].
+  final Color color;
 
-class ConverterRoute extends StatefulWidget{
-  final String name;
+  /// Units for this [Category].
   final List<Unit> units;
-  final ColorSwatch color;
+
+  /// This [ConverterRoute] requires the name, color, and units to not be null.
   const ConverterRoute({
     @required this.name,
+    @required this.color,
     @required this.units,
-    @required this.color
-    }): assert(name != null),
-        assert(units!=null),
-        assert(color!=null);
+  })  : assert(name != null),
+        assert(color != null),
+        assert(units != null);
 
-  Widget _buildConversionWidgets(List<Widget> conversions) {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) => conversions[index],
-      itemCount: conversions.length,
-    );
+  @override
+  _ConverterRouteState createState() => _ConverterRouteState();
+}
+
+class _ConverterRouteState extends State<ConverterRoute> {
+  // TODO: Set some variables, such as for keeping track of the user's input
+  // value and units
+
+  // TODO: Determine whether you need to override anything, such as initState()
+
+  // TODO: Add other helper functions. We've given you one, _format()
+
+  /// Clean up conversion; trim trailing zeros, e.g. 5.500 -> 5.5, 10.0 -> 10
+  String _format(double conversion) {
+    var outputNum = conversion.toStringAsPrecision(7);
+    if (outputNum.contains('.') && outputNum.endsWith('0')) {
+      var i = outputNum.length - 1;
+      while (outputNum[i] == '0') {
+        i -= 1;
+      }
+      outputNum = outputNum.substring(0, i + 1);
+    }
+    if (outputNum.endsWith('.')) {
+      return outputNum.substring(0, outputNum.length - 1);
+    }
+    return outputNum;
   }
 
   @override
-  State<StatefulWidget> createState() => ConverterRouteState();
-}
-
-class ConverterRouteState extends State<ConverterRoute>{
-  @override
   Widget build(BuildContext context) {
-    final conversions = <Conversion>[];
+    // TODO: Create the 'input' group of widgets. This is a Column that
+    // includes the input value, and 'from' unit [Dropdown].
+    final input = Padding(
+        padding: _padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              keyboardType: TextInputType.number,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
+              decoration: InputDecoration(
+                  labelText: 'Input',
+                  labelStyle: Theme
+                      .of(context)
+                      .textTheme
+                      .display1,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  )
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top:10),
+              padding: _padding,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).primaryColor
+                ),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  elevation: 0,
+                  items: dropdownOptions(),
+                  onChanged: (_) {},
+                ),
+              ),
+            ),
+          ],
+        )
+    );
 
-    for (var i = 0; i < widget.units.length; i++) {
-      conversions.add(Conversion(
-        name: widget.units[i].name,
-        subName: 'Conversion: ${widget.units[i].conversion}',
+    final arrows = RotatedBox(
+      quarterTurns: 1,
+      child: Icon(
+        Icons.compare_arrows,
+        size: 40.0,
+      )
+    );
+
+    final output = Padding(
+      padding: _padding,
+    );
+    final display = Padding(
+      padding: _padding,
+      child : Column(
+        children: [
+          input,
+          arrows,
+          output,
+        ],
+      )
+    );
+
+
+    // TODO: Create a compare arrows icon.
+
+    // TODO: Create the 'output' group of widgets. This is a Column that
+    // includes the output value, and 'to' unit [Dropdown].
+
+    // TODO: Return the input, arrows, and output widgets, wrapped in a Column.
+
+    // TODO: Delete the below placeholder code.
+    final unitWidgets = widget.units.map((Unit unit) {
+      return Container(
         color: widget.color,
+        margin: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            Text(
+              unit.name,
+              style: Theme.of(context).textTheme.headline,
+            ),
+            Text(
+              'Conversion: ${unit.conversion}',
+              style: Theme.of(context).textTheme.subhead,
+            ),
+          ],
+        ),
+      );
+    }).toList();
+
+    /*ListView(
+      children: unitWidgets,
+    );*/
+
+    return display;
+  }
+
+  List<DropdownMenuItem> dropdownOptions() {
+    List<DropdownMenuItem> dropdownOptions = List<DropdownMenuItem>();
+    for (int i = 0; i<widget.units.length; i++){
+      dropdownOptions.add(DropdownMenuItem(
+          child: Text(
+          '${widget.name} Unit ${i+1}'
+      ),
       ));
     }
-
-    final listView = Container(
-      color: Colors.white,
-      child: widget._buildConversionWidgets(conversions),
-    );
-
-    return Scaffold(
-      body: listView,
-    );
+    return dropdownOptions;
   }
 
 }
