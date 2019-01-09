@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "993181475749",
+    "firebase_url": "https://ilyaplus-test1-eg.firebaseio.com",
+    "project_id": "ilyaplus-test1-eg",
+    "storage_bucket": "ilyaplus-test1-eg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993181475749:android:b8b94309a7662a4a",
+        "android_client_info": {
+          "package_name": "garnier.emmanuel.ilyaplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993181475749-4ug2bkj2gm9me9bk0fsf59th2ea7lram.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHxpoDs2tFvEThey46URyvaVnQQkE1cjc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
