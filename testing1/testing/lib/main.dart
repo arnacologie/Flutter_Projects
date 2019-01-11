@@ -25,6 +25,7 @@ class MyHomeState extends State<MyHome> {
   static String _year;
   static String _gender;
   static List<DropdownMenuItem> _unitMenuItems;
+  static List<DropdownMenuItem> items;
   final List<Step> mySteps = [
     new Step(
       // Title of the Step
@@ -70,15 +71,12 @@ class MyHomeState extends State<MyHome> {
         isActive: true),
     new Step(
         title: new Text("Informations générales"),
-        content: Container(
-          padding: _padding,
-          child: Column(
+          content: Column(
             children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Container(
-                    width: 100.0,
+                  Expanded(
                     child: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -94,8 +92,8 @@ class MyHomeState extends State<MyHome> {
                       onSaved: (text) => _day = text,
                     ),
                   ),
-                  Container(
-                    width: 100.0,
+                  SizedBox(width: 20.0,),
+                  Expanded(
                     child: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -112,10 +110,17 @@ class MyHomeState extends State<MyHome> {
                     ),
                   ),
                 ],
-              )
+              ),
+               DropdownButtonHideUnderline(
+                 child: DropdownButton(
+                  //value: value,
+                    hint: Text("Choisis un mois"),
+                    items: loadItems(),
+                    onChanged: (_){}
+              ),
+               )
             ],
           ),
-        ),
         // You can change the style of the step icon i.e number, editing, etc.
         state: StepState.editing,
         isActive: true),
@@ -124,6 +129,12 @@ class MyHomeState extends State<MyHome> {
         content: new Text("Hello World!"),
         isActive: true),
   ];
+
+  static List<DropdownMenuItem> loadItems(){
+    items = List<DropdownMenuItem>();
+    items.add(DropdownMenuItem(child: Text('Janvier'), value: 'Janvier'));
+    return items;
+  }
 
   @override
   void initState() {

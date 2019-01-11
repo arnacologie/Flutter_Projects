@@ -24,9 +24,11 @@ class MainScreen extends StatefulWidget{
 class MainState extends State<MainScreen>{
   bool visible = true;
   final myController = TextEditingController();
+  List<DropdownMenuItem<int>> items;
 
   @override
   Widget build(BuildContext context) {
+    load();
     return Scaffold(
       appBar: AppBar(title: Text('Main screen')),
       body: Center(child: Container(
@@ -55,10 +57,21 @@ class MainState extends State<MainScreen>{
             ),
             SizedBox(height: 20,),
             SelectionButton(),
+            SizedBox(height: 20,),
+            DropdownButton(
+              onChanged: (_) {},
+              items: items,
+            )
         ],
         ),
       ),),
     );
+  }
+  void load(){
+    items = List<DropdownMenuItem<int>>();
+    items.add(DropdownMenuItem(child: Text('A'), value: 1,));
+    items.add(DropdownMenuItem(child: Text('B'), value: 2,));
+    items.add(DropdownMenuItem(child: Text('C'), value: 3,));
   }
 }
 
