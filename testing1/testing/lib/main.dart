@@ -16,7 +16,11 @@ class MyHome extends StatefulWidget {
 class MyHomeState extends State<MyHome> {
   // init the step to 0th position
   int currentStep = 0;
-  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey3= GlobalKey<FormState>();
+  static  GlobalKey<FormState> currentFormKey = _formKey1;
+  static final List<GlobalKey<FormState>> formKeys = List<GlobalKey<FormState>>();
   static final _padding = EdgeInsets.symmetric(vertical : 20.0);
   static String _name;
   static String _familyName;
@@ -26,15 +30,17 @@ class MyHomeState extends State<MyHome> {
   static String _gender;
   static List<DropdownMenuItem> _unitMenuItems;
   static List<DropdownMenuItem> items;
-  final List<Step> mySteps = [
-    new Step(
+  static String value = 'Janvier';
+  List<Step> get mySteps => [
+    Step(
       // Title of the Step
-        title: new Text("Saisissez votre nom"),
+        title : Text("Créer un compte"),
+        subtitle: Text("Saisissez votre nom"),
         // Content, it can be any widget here. Using basic Text for this example
         content: Container(
           padding: _padding,
           child: Form(
-            key: _formKey,
+            key: _formKey1,
             child: Column(
               children: <Widget>[
                 TextFormField(
@@ -69,62 +75,90 @@ class MyHomeState extends State<MyHome> {
           ),
         ),
         isActive: true),
-    new Step(
-        title: new Text("Informations générales"),
-          content: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    Step(
+        title: Text("Informations générales"),
+        subtitle: Text("Saisissez votre de date de naissance et votre sexe."),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical:8.0),
+            child: Form(
+              key: _formKey2,
+              child: Column(
                 children: <Widget>[
-                  Expanded(
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Jour',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Expanded(
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Jour',
+                            counterText: '',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          validator: (input){
+                            if(input.isEmpty) return 'Entrez un jour';
+                          },
+                          maxLength: 2,
+                          style: TextStyle(fontSize: 20, color:Colors.black,),
+                          onSaved: (text) => _day = text,
                         ),
                       ),
-                      validator: (input){
-                        if(input.isEmpty) return 'Entrez un jour';
-                      },
-                      style: TextStyle(fontSize: 20, color:Colors.black,),
-                      onSaved: (text) => _day = text,
-                    ),
-                  ),
-                  SizedBox(width: 20.0,),
-                  Expanded(
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Année',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                      SizedBox(width: 50.0,),
+                      Expanded(
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Année',
+                            counterText: '',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          validator: (input){
+                            if(input.isEmpty) return 'Entrez une année';
+                          },
+                          style: TextStyle(fontSize: 20, color:Colors.black),
+                          maxLength: 4,
+                          maxLengthEnforced: true,
+                          onSaved: (text) => _year = text,
                         ),
                       ),
-                      validator: (input){
-                        if(input.isEmpty) return 'Entrez une année';
-                      },
-                      style: TextStyle(fontSize: 20, color:Colors.black),
-                      onSaved: (text) => _year = text,
-                    ),
+                    ],
                   ),
+                   SizedBox(height: 25.0,),
+                   Container(
+                     decoration: BoxDecoration(
+                       border: Border.all(color :Colors.black54),
+                       borderRadius: BorderRadius.circular(10.0),
+                     ),
+                     child: DropdownButtonHideUnderline(
+                       child: ButtonTheme(
+                        alignedDropdown: true,
+                         child: DropdownButton(
+                            value: value,
+                            hint: Text("Mois", style: TextStyle(fontSize: 20),),
+                            items: loadItems(),
+                            onChanged: (newValue){
+                              setState(() {
+                                value = newValue;
+                                _month = newValue;
+                              });
+                            },
+                          ),
+                       ),
+                     ),
+                   ),
+                  SizedBox(height: 25.0,)
                 ],
               ),
-               DropdownButtonHideUnderline(
-                 child: DropdownButton(
-                  //value: value,
-                    hint: Text("Choisis un mois"),
-                    items: loadItems(),
-                    onChanged: (_){}
-              ),
-               )
-            ],
+            ),
           ),
         // You can change the style of the step icon i.e number, editing, etc.
         state: StepState.editing,
         isActive: true),
-    new Step(
+    Step(
         title: new Text("Step 3"),
         content: new Text("Hello World!"),
         isActive: true),
@@ -133,6 +167,17 @@ class MyHomeState extends State<MyHome> {
   static List<DropdownMenuItem> loadItems(){
     items = List<DropdownMenuItem>();
     items.add(DropdownMenuItem(child: Text('Janvier'), value: 'Janvier'));
+    items.add(DropdownMenuItem(child: Text('Février'), value: 'Février'));
+    items.add(DropdownMenuItem(child: Text('Mars'), value: 'Mars'));
+    items.add(DropdownMenuItem(child: Text('Avril'), value: 'Avril'));
+    items.add(DropdownMenuItem(child: Text('Mai'), value: 'Mai'));
+    items.add(DropdownMenuItem(child: Text('Juin'), value: 'Juin'));
+    items.add(DropdownMenuItem(child: Text('Juillet'), value: 'Juillet'));
+    items.add(DropdownMenuItem(child: Text('Août'), value: 'Août'));
+    items.add(DropdownMenuItem(child: Text('Septembre'), value: 'Septembre'));
+    items.add(DropdownMenuItem(child: Text('Octobre'), value: 'Octobre'));
+    items.add(DropdownMenuItem(child: Text('Novembre'), value: 'Novembre'));
+    items.add(DropdownMenuItem(child: Text('Décembre'), value: 'Décembre'));
     return items;
   }
 
@@ -141,6 +186,9 @@ class MyHomeState extends State<MyHome> {
     // TODO: implement initState
     super.initState();
     _createDropdownMenuItems();
+    formKeys.add(_formKey1);
+    formKeys.add(_formKey2);
+    formKeys.add(_formKey3);
   }
 
   @override
@@ -162,13 +210,13 @@ class MyHomeState extends State<MyHome> {
                   Container(
                     child: FlatButton(onPressed: (){
                         //hide the keyboard
-                      if(_formKey.currentState.validate()){
-                        _formKey.currentState.save();
+                      if(currentFormKey.currentState.validate()){
+                        currentFormKey.currentState.save();
                         FocusScope.of(context).requestFocus(new FocusNode());
                         onStepContinue();
                         Scaffold.of(context)
                         ..removeCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text("Prénom : $_name, Nom : $_familyName"),));
+                        ..showSnackBar(SnackBar(content: Text("Prénom : $_name, Nom : $_familyName, Mois : $_month, Annee : $_year"),));
                       }},
                       child: Text('Continuer', style:TextStyle(color: Colors.white)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -191,6 +239,7 @@ class MyHomeState extends State<MyHome> {
             onStepTapped: (step) {
               setState(() {
                 currentStep = step;
+                currentFormKey = formKeys[step];
               });
               // Log function call
               print("onStepTapped : " + step.toString());
@@ -199,8 +248,10 @@ class MyHomeState extends State<MyHome> {
               setState(() {
                 if (currentStep > 0) {
                   currentStep = currentStep - 1;
+                  currentFormKey = formKeys[currentStep];
                 } else {
                   currentStep = 0;
+                  currentFormKey = formKeys[currentStep];
                 }
               });
               print("onStepCancel : " + currentStep.toString());
@@ -209,8 +260,10 @@ class MyHomeState extends State<MyHome> {
               setState(() {
                 if (currentStep < mySteps.length - 1) {
                   currentStep = currentStep + 1;
+                  currentFormKey = formKeys[currentStep];
                 } else {
                   currentStep = 0;
+                  currentFormKey = formKeys[currentStep];
                 }
               });
               // Log function call
