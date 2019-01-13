@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:il_y_a_plus/Pages/home.dart';
 import 'package:il_y_a_plus/Pages/registration.dart';
+import 'package:il_y_a_plus/Utils/CustomNavRoute.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -64,7 +65,7 @@ class LoginPageState extends State<LoginPage> {
                   ),
                   RaisedButton(
                       onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(
+                        Navigator.push(context, CustomNavRoute(
                             builder: (context) => RegistrationPage()));
                       },
                       child: Text('Je n\'ai pas de compte',style: TextStyle(fontSize: 15.0, color: Colors.white),),
@@ -86,7 +87,7 @@ class LoginPageState extends State<LoginPage> {
       try {
         FirebaseUser user = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: _email, password: _password);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Home(user: user,)));
+        Navigator.push(context, CustomNavRoute(builder: (context) => Home(user: user,)));
       } catch (e) {
         print(e.message);
       }

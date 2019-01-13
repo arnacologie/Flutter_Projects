@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:testing/validator.dart';
 
 void main() {
   runApp(new MaterialApp(
     // Title
       title: "Simple Material App",
       // Home
-      home: new MyHome()));
+      home: new RegistrationPage()));
 }
 
-class MyHome extends StatefulWidget {
+class RegistrationPage extends StatefulWidget {
   @override
-  MyHomeState createState() => new MyHomeState();
+  RegistrationPageState createState() => new RegistrationPageState();
 }
 
-class MyHomeState extends State<MyHome> {
+class RegistrationPageState extends State<RegistrationPage> {
   // init the step to 0th position
   int currentStep = 0;
   static final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
@@ -22,20 +23,26 @@ class MyHomeState extends State<MyHome> {
   static  GlobalKey<FormState> currentFormKey = _formKey1;
   static final List<GlobalKey<FormState>> formKeys = List<GlobalKey<FormState>>();
   static final _padding = EdgeInsets.symmetric(vertical : 20.0);
-  static String _name;
+   String _name;
   static String _familyName;
   static String _day;
   static String _month;
   static String _year;
   static String _gender;
+  static String _nickname;
+  static String _password;
+  static String _confirmPassword;
   static List<DropdownMenuItem> _unitMenuItems;
-  static List<DropdownMenuItem> items;
-  static String value = 'Janvier';
+  static List<DropdownMenuItem> monthItems;
+  static List<DropdownMenuItem> genderItems;
+  static String monthValue = 'Janvier';
+  static String genderValue = 'Femme';
+  static bool isDateWrong = false;
+  static bool passwordsNoMatch = false;
   List<Step> get mySteps => [
     Step(
       // Title of the Step
-        title : Text("Créer un compte"),
-        subtitle: Text("Saisissez votre nom"),
+        title : Text("Saisissez votre nom"),
         // Content, it can be any widget here. Using basic Text for this example
         content: Container(
           padding: _padding,
@@ -99,6 +106,7 @@ class MyHomeState extends State<MyHome> {
                           ),
                           validator: (input){
                             if(input.isEmpty) return 'Entrez un jour';
+                            if(isDateWrong) {isDateWrong = false; return 'Entrez un jour valide';}
                           },
                           maxLength: 2,
                           style: TextStyle(fontSize: 20, color:Colors.black,),
@@ -128,27 +136,52 @@ class MyHomeState extends State<MyHome> {
                     ],
                   ),
                    SizedBox(height: 25.0,),
-                   Container(
-                     decoration: BoxDecoration(
-                       border: Border.all(color :Colors.black54),
-                       borderRadius: BorderRadius.circular(10.0),
-                     ),
-                     child: DropdownButtonHideUnderline(
-                       child: ButtonTheme(
-                        alignedDropdown: true,
-                         child: DropdownButton(
-                            value: value,
-                            hint: Text("Mois", style: TextStyle(fontSize: 20),),
-                            items: loadItems(),
-                            onChanged: (newValue){
-                              setState(() {
-                                value = newValue;
-                                _month = newValue;
-                              });
-                            },
-                          ),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                     children: <Widget>[
+                       Container(
+                         decoration: BoxDecoration(
+                           border: Border.all(color :Colors.black54),
+                           borderRadius: BorderRadius.circular(10.0),
+                         ),
+                         child: DropdownButtonHideUnderline(
+                           child: ButtonTheme(
+                            alignedDropdown: true,
+                             child: DropdownButton(
+                                value: monthValue,
+                                items: loadMonthItems(),
+                                onChanged: (newValue){
+                                  setState(() {
+                                    monthValue = newValue;
+                                    _month = newValue;
+                                  });
+                                },
+                              ),
+                           ),
+                         ),
                        ),
-                     ),
+                       Container(
+                         decoration: BoxDecoration(
+                           border: Border.all(color :Colors.black54),
+                           borderRadius: BorderRadius.circular(10.0),
+                         ),
+                         child: DropdownButtonHideUnderline(
+                           child: ButtonTheme(
+                             alignedDropdown: true,
+                             child: DropdownButton(
+                               value: genderValue,
+                               items: loadGenderItems(),
+                               onChanged: (newValue){
+                                 setState(() {
+                                   genderValue = newValue;
+                                   _gender = newValue;
+                                 });
+                               },
+                             ),
+                           ),
+                         ),
+                       ),
+                     ],
                    ),
                   SizedBox(height: 25.0,)
                 ],
@@ -159,27 +192,86 @@ class MyHomeState extends State<MyHome> {
         state: StepState.editing,
         isActive: true),
     Step(
-        title: new Text("Step 3"),
-        content: new Text("Hello World!"),
+        title: Text("Informations de connexion"),
+        content: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey3,
+              child: Column(
+                children: <Widget>[
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Nom d\'utilisateur',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0)
+                      )
+                    ),
+                    validator: (input){
+                      //TODO check with Firebase if already taken
+                      if(input.isEmpty) return 'Veuillez choisir un nom d\'utilisateur';
+                    },
+                    onSaved: (text) => _nickname = text,
+                  ),
+                  SizedBox(height: 20.0,),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        labelText: 'Créez un mot de passe',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0)
+                        )
+                    ),
+                    validator: (input){
+                      if(input.isEmpty) return 'Veuillez saisir un mot de passe';
+                    },
+                    onSaved: (text) => _password = text,
+                  ),
+                  SizedBox(height: 20.0,),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        labelText: 'Confirmer',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0)
+                        )
+                    ),
+                    validator: (input){
+                      if(input.isEmpty) return 'Veuillez confirmer le mot de passe';
+                      if(passwordsNoMatch) {passwordsNoMatch = false; return 'Les mots de passe ne correspondent pas.';}
+                    },
+                    onSaved: (text) => _confirmPassword = text,
+                  ),
+                ],
+              )
+          ),
+        ),
         isActive: true),
   ];
 
-  static List<DropdownMenuItem> loadItems(){
-    items = List<DropdownMenuItem>();
-    items.add(DropdownMenuItem(child: Text('Janvier'), value: 'Janvier'));
-    items.add(DropdownMenuItem(child: Text('Février'), value: 'Février'));
-    items.add(DropdownMenuItem(child: Text('Mars'), value: 'Mars'));
-    items.add(DropdownMenuItem(child: Text('Avril'), value: 'Avril'));
-    items.add(DropdownMenuItem(child: Text('Mai'), value: 'Mai'));
-    items.add(DropdownMenuItem(child: Text('Juin'), value: 'Juin'));
-    items.add(DropdownMenuItem(child: Text('Juillet'), value: 'Juillet'));
-    items.add(DropdownMenuItem(child: Text('Août'), value: 'Août'));
-    items.add(DropdownMenuItem(child: Text('Septembre'), value: 'Septembre'));
-    items.add(DropdownMenuItem(child: Text('Octobre'), value: 'Octobre'));
-    items.add(DropdownMenuItem(child: Text('Novembre'), value: 'Novembre'));
-    items.add(DropdownMenuItem(child: Text('Décembre'), value: 'Décembre'));
-    return items;
+  static List<DropdownMenuItem> loadMonthItems(){
+    monthItems = List<DropdownMenuItem>();
+    monthItems.add(DropdownMenuItem(child: Text('Janvier'), value: 'Janvier'));
+    monthItems.add(DropdownMenuItem(child: Text('Février'), value: 'Février'));
+    monthItems.add(DropdownMenuItem(child: Text('Mars'), value: 'Mars'));
+    monthItems.add(DropdownMenuItem(child: Text('Avril'), value: 'Avril'));
+    monthItems.add(DropdownMenuItem(child: Text('Mai'), value: 'Mai'));
+    monthItems.add(DropdownMenuItem(child: Text('Juin'), value: 'Juin'));
+    monthItems.add(DropdownMenuItem(child: Text('Juillet'), value: 'Juillet'));
+    monthItems.add(DropdownMenuItem(child: Text('Août'), value: 'Août'));
+    monthItems.add(DropdownMenuItem(child: Text('Septembre'), value: 'Septembre'));
+    monthItems.add(DropdownMenuItem(child: Text('Octobre'), value: 'Octobre'));
+    monthItems.add(DropdownMenuItem(child: Text('Novembre'), value: 'Novembre'));
+    monthItems.add(DropdownMenuItem(child: Text('Décembre'), value: 'Décembre'));
+    return monthItems;
   }
+
+  static List<DropdownMenuItem> loadGenderItems(){
+    genderItems = List<DropdownMenuItem>();
+    genderItems.add(DropdownMenuItem(child: Text('Femme'), value: 'Femme'));
+    genderItems.add(DropdownMenuItem(child: Text('Homme'), value: 'Homme'));
+    return genderItems;
+  }
+
 
   @override
   void initState() {
@@ -197,7 +289,7 @@ class MyHomeState extends State<MyHome> {
       // Appbar
       appBar: new AppBar(
         // Title
-        title: new Text("Simple Material App"),
+        title: new Text("Créer un compte"),
       ),
       // Body
       body: new Container(
@@ -211,13 +303,37 @@ class MyHomeState extends State<MyHome> {
                     child: FlatButton(onPressed: (){
                         //hide the keyboard
                       if(currentFormKey.currentState.validate()){
+                        if(currentFormKey == _formKey2){
+                          currentFormKey.currentState.save();
+                          print('DATE $_day, $_month,  $_year, $_gender');
+                          if(Validator.validateDate(_day, _month, _year)){
+                            onStepContinue();
+                            Scaffold.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(SnackBar(content: Text("Jour : $_day, Mois : $_month, Annee : $_year"),));
+                          }
+                          else isDateWrong = true;
+                        }
+                        else if(currentFormKey == _formKey3){
+                          currentFormKey.currentState.save();
+                          if(_password == _confirmPassword){
+                            onStepContinue();
+                            Scaffold.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(SnackBar(content: Text("User : $_nickname, Password : $_password, C_Password : $_confirmPassword"),));
+                          }
+                          else passwordsNoMatch = true;
+                        }
+                        else{
                         currentFormKey.currentState.save();
-                        FocusScope.of(context).requestFocus(new FocusNode());
+                        //FocusScope.of(context).requestFocus(new FocusNode());
                         onStepContinue();
                         Scaffold.of(context)
                         ..removeCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text("Prénom : $_name, Nom : $_familyName, Mois : $_month, Annee : $_year"),));
-                      }},
+                        ..showSnackBar(SnackBar(content: Text("Prénom : $_name, Nom : $_familyName, Mois : $_month, Annee : $_year, User : $_nickname"),));
+                        }
+                      }
+                    },
                       child: Text('Continuer', style:TextStyle(color: Colors.white)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                       color: Colors.green,
