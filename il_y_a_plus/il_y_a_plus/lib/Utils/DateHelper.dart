@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-class Validator {
+class DateHelper {
 
   static const _maxDayinMonth = {
     // Key:    Value
@@ -17,6 +17,21 @@ class Validator {
     'Décembre': 31,
   };
 
+  static const _monthList = {
+    // Key:    Value
+    'Janvier': "01",
+    'Février': "02",
+    'Mars': "03",
+    'Avril': "04",
+    'Mai': "05",
+    'Juin': "06",
+    'Juillet': "07",
+    'Août': "08",
+    'Septembre': "09",
+    'Octobre': "10",
+    'Novembre': "11",
+    'Décembre': "12",
+  };
 
   static bool validateDate(String dayString, String monthString, String yearString){
     int day = int.parse(dayString);
@@ -40,6 +55,14 @@ class Validator {
     if(year%4==0 && year%100!=0) return true;
     else if(year%400==0) return true;
     return false;
+  }
+
+  static String convertDateforDB(String day, String month, String year){
+    String monthFormatted;
+    if(_monthList.containsKey(month)){
+      monthFormatted = _monthList[month].toString();
+    }
+    return '$day/$monthFormatted/$year';
   }
 }
 

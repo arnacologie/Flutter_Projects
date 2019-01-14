@@ -1,441 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:testing/validator.dart';
 
 void main() {
-  runApp(new MaterialApp(
-    // Title
-      title: "Simple Material App",
-      // Home
-      home: new RegistrationPage()));
+  runApp(MyApp());
 }
 
-class RegistrationPage extends StatefulWidget {
+class MyApp extends StatefulWidget {
   @override
-  RegistrationPageState createState() => new RegistrationPageState();
+  State<StatefulWidget> createState() => MyAppState();
 }
 
-class RegistrationPageState extends State<RegistrationPage> {
-  // init the step to 0th position
-  int currentStep = 0;
-  static final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
-  static final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
-  static final GlobalKey<FormState> _formKey3= GlobalKey<FormState>();
-  static  GlobalKey<FormState> currentFormKey = _formKey1;
-  static final List<GlobalKey<FormState>> formKeys = List<GlobalKey<FormState>>();
-  static final _padding = EdgeInsets.symmetric(vertical : 20.0);
-   String _name;
-  static String _familyName;
-  static String _day;
-  static String _month;
-  static String _year;
-  static String _gender;
-  static String _nickname;
-  static String _password;
-  static String _confirmPassword;
-  static List<DropdownMenuItem> _unitMenuItems;
-  static List<DropdownMenuItem> monthItems;
-  static List<DropdownMenuItem> genderItems;
-  static String monthValue = 'Janvier';
-  static String genderValue = 'Femme';
-  static bool isDateWrong = false;
-  static bool passwordsNoMatch = false;
-  List<Step> get mySteps => [
-    Step(
-      // Title of the Step
-        title : Text("Saisissez votre nom"),
-        // Content, it can be any widget here. Using basic Text for this example
-        content: Container(
-          padding: _padding,
-          child: Form(
-            key: _formKey1,
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Prénom',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  validator: (input){
-                    if(input.isEmpty) return 'Entrez votre prénom';
-                  },
-                  style: TextStyle(fontSize: 20, color:Colors.black),
-                  onSaved: (text) => _name = text,
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Nom',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  validator: (input){
-                    if(input.isEmpty) return 'Entrez votre nom';
-                  },
-                  style: TextStyle(fontSize: 20, color:Colors.black),
-                  onSaved: (text) => _familyName = text,
-                ),
-              ],
-            ),
-          ),
-        ),
-        isActive: true),
-    Step(
-        title: Text("Informations générales"),
-        subtitle: Text("Saisissez votre de date de naissance et votre sexe."),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical:8.0),
-            child: Form(
-              key: _formKey2,
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Expanded(
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Jour',
-                            counterText: '',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          validator: (input){
-                            if(input.isEmpty) return 'Entrez un jour';
-                            if(isDateWrong) {isDateWrong = false; return 'Entrez un jour valide';}
-                          },
-                          maxLength: 2,
-                          style: TextStyle(fontSize: 20, color:Colors.black,),
-                          onSaved: (text) => _day = text,
-                        ),
-                      ),
-                      SizedBox(width: 50.0,),
-                      Expanded(
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Année',
-                            counterText: '',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          validator: (input){
-                            if(input.isEmpty) return 'Entrez une année';
-                          },
-                          style: TextStyle(fontSize: 20, color:Colors.black),
-                          maxLength: 4,
-                          maxLengthEnforced: true,
-                          onSaved: (text) => _year = text,
-                        ),
-                      ),
-                    ],
-                  ),
-                   SizedBox(height: 25.0,),
-                   Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                     children: <Widget>[
-                       Container(
-                         decoration: BoxDecoration(
-                           border: Border.all(color :Colors.black54),
-                           borderRadius: BorderRadius.circular(10.0),
-                         ),
-                         child: DropdownButtonHideUnderline(
-                           child: ButtonTheme(
-                            alignedDropdown: true,
-                             child: DropdownButton(
-                                value: monthValue,
-                                items: loadMonthItems(),
-                                onChanged: (newValue){
-                                  setState(() {
-                                    monthValue = newValue;
-                                    _month = newValue;
-                                  });
-                                },
-                              ),
-                           ),
-                         ),
-                       ),
-                       Container(
-                         decoration: BoxDecoration(
-                           border: Border.all(color :Colors.black54),
-                           borderRadius: BorderRadius.circular(10.0),
-                         ),
-                         child: DropdownButtonHideUnderline(
-                           child: ButtonTheme(
-                             alignedDropdown: true,
-                             child: DropdownButton(
-                               value: genderValue,
-                               items: loadGenderItems(),
-                               onChanged: (newValue){
-                                 setState(() {
-                                   genderValue = newValue;
-                                   _gender = newValue;
-                                 });
-                               },
-                             ),
-                           ),
-                         ),
-                       ),
-                     ],
-                   ),
-                  SizedBox(height: 25.0,)
-                ],
-              ),
-            ),
-          ),
-        // You can change the style of the step icon i.e number, editing, etc.
-        state: StepState.editing,
-        isActive: true),
-    Step(
-        title: Text("Informations de connexion"),
-        content: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            key: _formKey3,
-              child: Column(
-                children: <Widget>[
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Nom d\'utilisateur',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0)
-                      )
-                    ),
-                    validator: (input){
-                      //TODO check with Firebase if already taken
-                      if(input.isEmpty) return 'Veuillez choisir un nom d\'utilisateur';
-                    },
-                    onSaved: (text) => _nickname = text,
-                  ),
-                  SizedBox(height: 20.0,),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        labelText: 'Créez un mot de passe',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0)
-                        )
-                    ),
-                    validator: (input){
-                      if(input.isEmpty) return 'Veuillez saisir un mot de passe';
-                    },
-                    onSaved: (text) => _password = text,
-                  ),
-                  SizedBox(height: 20.0,),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        labelText: 'Confirmer',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0)
-                        )
-                    ),
-                    validator: (input){
-                      if(input.isEmpty) return 'Veuillez confirmer le mot de passe';
-                      if(passwordsNoMatch) {passwordsNoMatch = false; return 'Les mots de passe ne correspondent pas.';}
-                    },
-                    onSaved: (text) => _confirmPassword = text,
-                  ),
-                ],
-              )
-          ),
-        ),
-        isActive: true),
-  ];
-
-  static List<DropdownMenuItem> loadMonthItems(){
-    monthItems = List<DropdownMenuItem>();
-    monthItems.add(DropdownMenuItem(child: Text('Janvier'), value: 'Janvier'));
-    monthItems.add(DropdownMenuItem(child: Text('Février'), value: 'Février'));
-    monthItems.add(DropdownMenuItem(child: Text('Mars'), value: 'Mars'));
-    monthItems.add(DropdownMenuItem(child: Text('Avril'), value: 'Avril'));
-    monthItems.add(DropdownMenuItem(child: Text('Mai'), value: 'Mai'));
-    monthItems.add(DropdownMenuItem(child: Text('Juin'), value: 'Juin'));
-    monthItems.add(DropdownMenuItem(child: Text('Juillet'), value: 'Juillet'));
-    monthItems.add(DropdownMenuItem(child: Text('Août'), value: 'Août'));
-    monthItems.add(DropdownMenuItem(child: Text('Septembre'), value: 'Septembre'));
-    monthItems.add(DropdownMenuItem(child: Text('Octobre'), value: 'Octobre'));
-    monthItems.add(DropdownMenuItem(child: Text('Novembre'), value: 'Novembre'));
-    monthItems.add(DropdownMenuItem(child: Text('Décembre'), value: 'Décembre'));
-    return monthItems;
-  }
-
-  static List<DropdownMenuItem> loadGenderItems(){
-    genderItems = List<DropdownMenuItem>();
-    genderItems.add(DropdownMenuItem(child: Text('Femme'), value: 'Femme'));
-    genderItems.add(DropdownMenuItem(child: Text('Homme'), value: 'Homme'));
-    return genderItems;
-  }
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _createDropdownMenuItems();
-    formKeys.add(_formKey1);
-    formKeys.add(_formKey2);
-    formKeys.add(_formKey3);
-  }
-
+class MyAppState extends State<MyApp>{
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      // Appbar
-      appBar: new AppBar(
-        // Title
-        title: new Text("Créer un compte"),
-      ),
-      // Body
-      body: new Container(
-          child: new Stepper(
-            // Using a variable here for handling the currentStep
-            currentStep: this.currentStep,
-            controlsBuilder: (BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-              return Row(
-                children: <Widget>[
-                  Container(
-                    child: FlatButton(onPressed: (){
-                        //hide the keyboard
-                      if(currentFormKey.currentState.validate()){
-                        if(currentFormKey == _formKey2){
-                          currentFormKey.currentState.save();
-                          print('DATE $_day, $_month,  $_year, $_gender');
-                          if(Validator.validateDate(_day, _month, _year)){
-                            onStepContinue();
-                            Scaffold.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(SnackBar(content: Text("Jour : $_day, Mois : $_month, Annee : $_year"),));
-                          }
-                          else isDateWrong = true;
-                        }
-                        else if(currentFormKey == _formKey3){
-                          currentFormKey.currentState.save();
-                          if(_password == _confirmPassword){
-                            onStepContinue();
-                            Scaffold.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(SnackBar(content: Text("User : $_nickname, Password : $_password, C_Password : $_confirmPassword"),));
-                          }
-                          else passwordsNoMatch = true;
-                        }
-                        else{
-                        currentFormKey.currentState.save();
-                        //FocusScope.of(context).requestFocus(new FocusNode());
-                        onStepContinue();
-                        Scaffold.of(context)
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text("Prénom : $_name, Nom : $_familyName, Mois : $_month, Annee : $_year, User : $_nickname"),));
-                        }
-                      }
-                    },
-                      child: Text('Continuer', style:TextStyle(color: Colors.white)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                      color: Colors.green,
-                    ),
-                  ),
-                  SizedBox(width: 20.0,),
-                  Container(
-                    child: FlatButton(onPressed: onStepCancel,
-                      child: Text('Annuler', style:TextStyle(color: Colors.white)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              );
-            },
-            steps: mySteps,
-            type: StepperType.vertical,
-            onStepTapped: (step) {
-              setState(() {
-                currentStep = step;
-                currentFormKey = formKeys[step];
-              });
-              // Log function call
-              print("onStepTapped : " + step.toString());
-            },
-            onStepCancel: () {
-              setState(() {
-                if (currentStep > 0) {
-                  currentStep = currentStep - 1;
-                  currentFormKey = formKeys[currentStep];
-                } else {
-                  currentStep = 0;
-                  currentFormKey = formKeys[currentStep];
-                }
-              });
-              print("onStepCancel : " + currentStep.toString());
-            },
-            onStepContinue: () {
-              setState(() {
-                if (currentStep < mySteps.length - 1) {
-                  currentStep = currentStep + 1;
-                  currentFormKey = formKeys[currentStep];
-                } else {
-                  currentStep = 0;
-                  currentFormKey = formKeys[currentStep];
-                }
-              });
-              // Log function call
-              print("onStepContinue : " + currentStep.toString());
-            },
-          )),
-    );
-  }
-
-  void _createDropdownMenuItems() {
-    var newItems = <DropdownMenuItem>[];
-    for(int i = 1; i<32; i++){
-      newItems.add(DropdownMenuItem(
-          value: i,
-          child: Text(
-            i.toString(),
-            softWrap: true,
-          )
-      ));
-    }
-
-    setState(() {
-      _unitMenuItems = newItems;
-    });
-  }
-
-  Widget _createDropdown(String currentValue) {
-    return Container(
-      margin: EdgeInsets.only(top: 16.0),
-      decoration: BoxDecoration(
-        // This sets the color of the [DropdownButton] itself
-        color: Colors.grey[50],
-        border: Border.all(
-          color: Colors.grey[400],
-          width: 1.0,
+    final title = 'Grid List';
+    final interests = ['Front Web', 'Back Web', 'Mobile' ,'Jeu Vidéo', 'Réseau', 'Sécurité'];
+    final colorBox = [Color(0xFF4c86c6), Color(0xFFee3c4c),Color(0xFFf47e54), Color(0xFF4ebc97), Color(0xFF23334a), Color(0xFF9C27B0)];
+    bool _visible = false;
+    return MaterialApp(
+      title: title,
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(title),
         ),
-      ),
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: Theme(
-        // This sets the color of the [DropdownMenuItem]
-        data: Theme.of(context).copyWith(
-          canvasColor: Colors.grey[50],
-        ),
-        child: DropdownButtonHideUnderline(
-          child: ButtonTheme(
-            alignedDropdown: true,
-            child: DropdownButton(
-              value: currentValue,
-              items: _unitMenuItems,
-              style: Theme.of(context).textTheme.title,
-            ),
-          ),
+        body: GridView.count(
+          // Create a grid with 2 columns. If you change the scrollDirection to
+          // horizontal, this would produce 2 rows.
+          crossAxisCount: 2,
+          // Generate 100 Widgets that display their index in the List
+          children: List.generate(interests.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: FlatButton(
+                color: colorBox[index],
+                onPressed: (){
+                  setState(() {
+                    _visible = !_visible;
+                  });
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color:Colors.transparent),
+                          borderRadius: BorderRadius.circular(5.0)
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${interests[index]}',
+                          style: TextStyle(fontFamily: 'Montserrat', fontSize: 23, fontWeight: FontWeight.w700, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Align(child: Opacity(
+                        opacity: _visible ? 1.0 : 0.0,
+                        child: Icon(Icons.check, color: Colors.white, size: 50,)), alignment: AlignmentDirectional(1.25, 1),)
+                  ],
+                ),
+              ),
+            );
+          }),
         ),
       ),
     );
   }
-
 
 }

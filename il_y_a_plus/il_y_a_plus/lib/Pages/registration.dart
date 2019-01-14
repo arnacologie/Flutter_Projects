@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:il_y_a_plus/Utils/Validator.dart';
+import 'package:il_y_a_plus/Utils/DropDownLoader.dart';
+import 'package:il_y_a_plus/Utils/DateHelper.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -13,31 +14,33 @@ class RegistrationPageState extends State<RegistrationPage> {
   static final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
   static final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
   static final GlobalKey<FormState> _formKey3= GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey4= GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey5= GlobalKey<FormState>();
+  final interests = ['Front Web', 'Back Web', 'Mobile', 'Jeu Vidéo', 'Réseau', 'Sécurité'];
+  final colorBox = [Color(0xFF4c86c6), Color(0xFFee3c4c),Color(0xFFf47e54), Color(0xFF4ebc97), Color(0xFF23334a), Color(0xFF9C27B0)];
   static  GlobalKey<FormState> currentFormKey = _formKey1;
   static final List<GlobalKey<FormState>> formKeys = List<GlobalKey<FormState>>();
   static final _padding = EdgeInsets.symmetric(vertical : 20.0);
   static String _name;
   static String _familyName;
   static String _day;
-  static String _month = 'Janvier';
+  static String _month;
   static String _year;
-  static String _gender = 'Femme';
+  static String _gender;
   static String _nickname;
   static String _password;
   static String _confirmPassword;
-  static List<DropdownMenuItem> _unitMenuItems;
-  static List<DropdownMenuItem> monthItems;
-  static List<DropdownMenuItem> genderItems;
-  static String monthValue = 'Janvier';
-  static String genderValue = 'Femme';
-  static bool isDateWrong = false;
-  static bool passwordsNoMatch = false;
+  static String _school;
+  static String _grade;
+  static bool _isDateWrong = false;
+  static bool _passwordsNoMatch = false;
+  static List<bool> _visible = [false, false, false, false, false, false];
   List<Step> get mySteps => [
     Step(
       // Title of the Step
         title : Text("Saisissez votre nom"),
         // Content, it can be any widget here. Using basic Text for this example
-        content: Container(
+        content: Padding(
           padding: _padding,
           child: Form(
             key: _formKey1,
@@ -79,7 +82,7 @@ class RegistrationPageState extends State<RegistrationPage> {
         title: Text("Informations générales"),
         subtitle: Text("Saisissez votre de date de naissance et votre sexe."),
         content: Padding(
-          padding: const EdgeInsets.symmetric(vertical:8.0),
+          padding: _padding,
           child: Form(
             key: _formKey2,
             child: Column(
@@ -99,7 +102,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                         ),
                         validator: (input){
                           if(input.isEmpty) return 'Entrez un jour';
-                          if(isDateWrong) {isDateWrong = false; return 'Entrez un jour valide';}
+                          if(_isDateWrong) {_isDateWrong = false; return 'Entrez un jour valide';}
                         },
                         maxLength: 2,
                         style: TextStyle(fontSize: 20, color:Colors.black,),
@@ -128,7 +131,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 25.0,),
+                SizedBox(height: 20,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -141,11 +144,10 @@ class RegistrationPageState extends State<RegistrationPage> {
                         child: ButtonTheme(
                           alignedDropdown: true,
                           child: DropdownButton(
-                            value: monthValue,
-                            items: loadMonthItems(),
+                            value: _month,
+                            items: DropDownLoader.loadMonthItems(),
                             onChanged: (newValue){
                               setState(() {
-                                monthValue = newValue;
                                 _month = newValue;
                               });
                             },
@@ -162,11 +164,10 @@ class RegistrationPageState extends State<RegistrationPage> {
                         child: ButtonTheme(
                           alignedDropdown: true,
                           child: DropdownButton(
-                            value: genderValue,
-                            items: loadGenderItems(),
+                            value: _gender,
+                            items: DropDownLoader.loadGenderItems(),
                             onChanged: (newValue){
                               setState(() {
-                                genderValue = newValue;
                                 _gender = newValue;
                               });
                             },
@@ -176,7 +177,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 25.0,)
+                //SizedBox(height: 25.0,)
               ],
             ),
           ),
@@ -185,11 +186,112 @@ class RegistrationPageState extends State<RegistrationPage> {
         state: StepState.editing,
         isActive: true),
     Step(
-        title: Text("Informations de connexion"),
+        title: Text("Informations campus"),
         content: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: _padding,
           child: Form(
               key: _formKey3,
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color :Colors.black54),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: ButtonTheme(
+                        alignedDropdown: true,
+                        child: DropdownButton(
+                          value: _grade,
+                          items: DropDownLoader.loadGradeItems(),
+                          onChanged: (newValue){
+                            setState(() {
+                              _grade = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20.0,),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color :Colors.black54),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: ButtonTheme(
+                        alignedDropdown: true,
+                        child: DropdownButton(
+                          value: _school,
+                          items: DropDownLoader.loadSchoolItems(),
+                          onChanged: (newValue){
+                            setState(() {
+                              _school = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+          ),
+        ),
+        isActive: true),
+    Step(
+        title: Text("Informations intérêts"),
+        content: Container(
+          padding: _padding,
+          //color: Colors.grey,
+          height: 500,
+          width: 300,
+          child: Form(
+            key : _formKey4,
+            child: GridView.count(
+              // Create a grid with 2 columns. If you change the scrollDirection to
+              // horizontal, this would produce 2 rows.
+              crossAxisCount: 2,
+              // Generate 100 Widgets that display their index in the List
+              children: List.generate(interests.length, (index) {
+                return Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: FlatButton(
+                    color: colorBox[index],
+                    onPressed: (){
+                      setState(() {
+                        _visible[index] = !_visible[index];
+                      });
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color:Colors.transparent),
+                              borderRadius: BorderRadius.circular(5.0)
+                          ),
+                          child: Center(
+                            child: generateTextGrid(interests[index])
+                          ),
+                        ),
+                        Align(child: Opacity(
+                            opacity: _visible[index] ? 1.0 : 0.0,
+                            child: Icon(Icons.check, color: Colors.white, size: 60,)), alignment: AlignmentDirectional(1.5, 1),)
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
+        isActive: true),
+    Step(
+        title: Text("Informations de connexion"),
+        content: Padding(
+          padding: _padding,
+          child: Form(
+              key: _formKey5,
               child: Column(
                 children: <Widget>[
                   TextFormField(
@@ -230,7 +332,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                     ),
                     validator: (input){
                       if(input.isEmpty) return 'Veuillez confirmer le mot de passe';
-                      if(passwordsNoMatch) {passwordsNoMatch = false; return 'Les mots de passe ne correspondent pas.';}
+                      if(_passwordsNoMatch) {_passwordsNoMatch = false; return 'Les mots de passe ne correspondent pas.';}
                     },
                     onSaved: (text) => _confirmPassword = text,
                   ),
@@ -241,29 +343,58 @@ class RegistrationPageState extends State<RegistrationPage> {
         isActive: true),
   ];
 
-  static List<DropdownMenuItem> loadMonthItems(){
-    monthItems = List<DropdownMenuItem>();
-    monthItems.add(DropdownMenuItem(child: Text('Janvier'), value: 'Janvier'));
-    monthItems.add(DropdownMenuItem(child: Text('Février'), value: 'Février'));
-    monthItems.add(DropdownMenuItem(child: Text('Mars'), value: 'Mars'));
-    monthItems.add(DropdownMenuItem(child: Text('Avril'), value: 'Avril'));
-    monthItems.add(DropdownMenuItem(child: Text('Mai'), value: 'Mai'));
-    monthItems.add(DropdownMenuItem(child: Text('Juin'), value: 'Juin'));
-    monthItems.add(DropdownMenuItem(child: Text('Juillet'), value: 'Juillet'));
-    monthItems.add(DropdownMenuItem(child: Text('Août'), value: 'Août'));
-    monthItems.add(DropdownMenuItem(child: Text('Septembre'), value: 'Septembre'));
-    monthItems.add(DropdownMenuItem(child: Text('Octobre'), value: 'Octobre'));
-    monthItems.add(DropdownMenuItem(child: Text('Novembre'), value: 'Novembre'));
-    monthItems.add(DropdownMenuItem(child: Text('Décembre'), value: 'Décembre'));
-    return monthItems;
+  Column generateTextGrid(String text) {
+    if(!text.contains(' ')) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+          '$text',
+            style: TextStyle(fontFamily: 'Montserrat', fontSize: 23, fontWeight: FontWeight.w700, color: Colors.white),
+          )
+        ],
+      );
+    }
+    else{
+      List<String> textParts = text.split(' ');
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            '${textParts[0]}',
+            style: TextStyle(fontFamily: 'Montserrat', fontSize: 23, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+          SizedBox(height: 10.0,),
+          Text(
+            '${textParts[1]}',
+            style: TextStyle(fontFamily: 'Montserrat', fontSize: 23, fontWeight: FontWeight.w700, color: Colors.white),
+          )
+        ],
+      );
+    }
   }
-
-  static List<DropdownMenuItem> loadGenderItems(){
-    genderItems = List<DropdownMenuItem>();
-    genderItems.add(DropdownMenuItem(child: Text('Femme'), value: 'Femme'));
-    genderItems.add(DropdownMenuItem(child: Text('Homme'), value: 'Homme'));
-    return genderItems;
-  }
+    /*List<Widget> list = List<Widget>();
+    if(list.length<2) {
+      list.add(Text(
+        '${list[0]}',
+        style: TextStyle(fontFamily: 'Montserrat',
+            fontSize: 23,
+            fontWeight: FontWeight.w700,
+            color: Colors.white),
+      ));
+      return list;
+    }
+    else {
+      list.add(Text(
+        '${list}',
+        style: TextStyle(fontFamily: 'Montserrat', fontSize: 23, fontWeight: FontWeight.w700, color: Colors.white),
+      ));
+      list.add(Text(
+        '${list[1]}',
+        style: TextStyle(fontFamily: 'Montserrat', fontSize: 23, fontWeight: FontWeight.w700, color: Colors.white),
+      ));
+      return list;
+    }*/
 
   //TODO disable on step click is not secure enough
   void createAccount() async {
@@ -285,15 +416,15 @@ class RegistrationPageState extends State<RegistrationPage> {
       if(currentFormKey == _formKey2){
         currentFormKey.currentState.save();
         print('DATE $_day, $_month,  $_year, $_gender');
-        if(Validator.validateDate(_day, _month, _year)){
+        if(DateHelper.validateDate(_day, _month, _year)){
           onStepContinue();
           Scaffold.of(context)
             ..removeCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text("Jour : $_day, Mois : $_month, Annee : $_year"),));
+            ..showSnackBar(SnackBar(content: Text("Jour : $_day, Mois : $_month, Annee : $_year, DateFormatted ${DateHelper.convertDateforDB(_day, _month, _year)}"),));
         }
-        else isDateWrong = true;
+        else _isDateWrong = true;
       }
-      else if(currentFormKey == _formKey3){
+      else if(currentFormKey == _formKey5){
         currentFormKey.currentState.save();
         if(_password == _confirmPassword){
           onStepContinue();
@@ -301,7 +432,7 @@ class RegistrationPageState extends State<RegistrationPage> {
             ..removeCurrentSnackBar()
             ..showSnackBar(SnackBar(content: Text("Votre compte vient d'être créé")),);
         }
-        else passwordsNoMatch = true;
+        else _passwordsNoMatch = true;
       }
       else{
         currentFormKey.currentState.save();
@@ -314,6 +445,8 @@ class RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -321,6 +454,11 @@ class RegistrationPageState extends State<RegistrationPage> {
     formKeys.add(_formKey1);
     formKeys.add(_formKey2);
     formKeys.add(_formKey3);
+    formKeys.add(_formKey4);
+    _month = 'Janvier';
+    _gender = 'Femme';
+    _school = 'Ingésup';
+    _grade = 'B1';
   }
 
   @override
