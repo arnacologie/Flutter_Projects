@@ -285,6 +285,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                 key: _formKey4,
                 child: GridView.count(
                   crossAxisCount: 2,
+                  physics: new NeverScrollableScrollPhysics(),
                   children: List.generate(interestsAndChecked.length, (index) {
                     return Padding(
                       padding: const EdgeInsets.all(5.0),
